@@ -21,7 +21,7 @@ class ConnClient(threading.Thread):
                 # self.conn_socket.send(senddata)
                 recvdata = self.conn_socket.recv(1024)
                 print "ReciveData:"+recvdata
-                if (recvdata == "quit") or (senddata == "quit"):
+                if (recvdata == "quit"):
                     break
 
         except socket.error:

@@ -35,7 +35,7 @@ def main():
         #print "ReciveData:"+recvdata
         senddata = raw_input("SendData:")
         c_socket.send(senddata)
-        if (recvdata == "quit") or (senddata == "quit"):
+        if (senddata == "quit"):
             c_socket.close()
             break
 
