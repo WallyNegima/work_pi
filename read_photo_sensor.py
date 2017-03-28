@@ -3,7 +3,7 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 
-a_oin = 18
+a_pin = 18
 b_pin = 23
 
 def discharge():
@@ -26,5 +26,5 @@ def analog_read():
     return charge_time()
 
 while True:
-    print(analog_read())
+    print analog_read()
     time.sleep(1)
