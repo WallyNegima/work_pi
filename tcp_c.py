@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 import socket
 import time
 import sys
@@ -42,5 +43,5 @@ def main():
 
 if __name__ == '__main__':
     connector = MySQLab.connect(host="localhost", db="s_test", user="root", passwd="", charset="utf8")
-    connector.close() 
+    connector.close()
     main()
