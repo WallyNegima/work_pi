@@ -2,7 +2,7 @@
 import socket
 import time
 import sys
-import MySQLdb
+#import MySQLdb
 
 HOSTNAME = "192.168.11.254"
 PORT = 12345
@@ -42,6 +42,4 @@ def main():
             break
 
 if __name__ == '__main__':
-    connector = MySQLdb.connect(host="localhost", db="s_test", user="root", passwd="", charset="utf8")
-    connector.close()
     main()

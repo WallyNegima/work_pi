@@ -20,9 +20,9 @@ class ConnClient(threading.Thread):
                 # senddata = raw_input(str(self.addr)+" SendData:")
                 # self.conn_socket.send(senddata)
                 recvdata = self.conn_socket.recv(1024)
-                sql = u"insert into send_data values('id1', 'recvdata');
-                cursor.execute(sql)
-                connector.commit()
+                #sql = u"insert into send_data values('id1', 'recvdata')"
+                #cursor.execute(sql)
+                #connector.commit()
                 print "ReciveData:"+recvdata
                 if (recvdata == "quit"):
                     break
@@ -50,6 +50,6 @@ def main():
             connClientThread.start()
 
 if __name__ == '__main__':
-    connector = MySQLab.connect(host="localhost", db="s_test", user="root", passwd="", charset="utf8")
-    cursor = connector.cursor()
+    #connector = MySQLab.connect(host="localhost", db="s_test", user="root", passwd="", charset="utf8")
+    #cursor = connector.cursor()
     main()
