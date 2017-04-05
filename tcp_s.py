@@ -14,11 +14,25 @@ s_socket.listen(CLIENTNUM)
 conn, addr = s_socket.accept()
 print("Conneted by"+str(addr))
 
+# データベースへの接続
+connector = MySQLdb.connect(host="localhost", db="pi_sensor", user="root", passwd="", charset="utf8")
+# カーソルを取得
+cursor = connector.cursor()
+
+#sql = u"insert into temp_values values(1, 5)"
+#cursor.execute(sql)
+
+
 while True:
     recvdata = conn.recv(1024)
     print "ReciveData:"+recvdata
-    if (recvdata == "quit"):
+    if (recvdata == "quit" or recvdata == "¥n"):
         break
+# database commit & close
+connector.commit()
+cursor.close()
+connector.close()
+# socket connection close
 conn.close()
 
 """
