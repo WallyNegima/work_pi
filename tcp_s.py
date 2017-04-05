@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import socket
-import threading
-import time
 import MySQLdb
 import sys
 
@@ -9,6 +7,21 @@ HOSTNAME = "192.168.11.254"
 PORT = 12345
 CLIENTNUM = 3
 
+s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s_socket.bind((HOSTNAME, PORT))
+s_socket.listen(CLIENTNUM)
+
+conn, addr = s_socket.accept()
+print("Conneted by"+str(addr))
+
+while True:
+    recvdata = conn.recv(1024)
+    print "ReciveData:"+recvdata
+    if (recvdata == "quit"):
+        break
+conn.close()
+
+"""
 class ConnClient(threading.Thread):
 
     def __init__(self,conn,addr):
@@ -67,3 +80,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""

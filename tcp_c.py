@@ -9,6 +9,21 @@ PORT = 12345
 INTERVAL = 3
 RETRYTIMES = 10
 
+
+c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+c_socket.connect((HOSTNAME, PORT))
+
+if c_socket is None:
+    print "system exit:connection error"
+    sys.exit(0)
+
+while(1):
+    senddata = raw_input("SendData:")
+    c_socket.send(senddata)
+    if (senddata == "quit"):
+        c_socket.close()
+        break
+
 def socket_connect(host, port, interval, retries):
 
     c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -23,7 +38,7 @@ def socket_connect(host, port, interval, retries):
 
     c_socket.close()
     return None
-
+"""
 def main():
 
     c_socket = socket_connect(HOSTNAME,PORT,INTERVAL,RETRYTIMES)
@@ -48,3 +63,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""
