@@ -42,6 +42,16 @@ def main():
         s_socket.bind((HOSTNAME, PORT))
         s_socket.listen(CLIENTNUM)
 
+        # データベースへの接続
+        connector = MySQLdb.connect(host="localhost", db="pi_sensor", user="root", passwd="", charset="utf-8")
+        # カーソルを取得
+        cursor = connector.cursor()
+
+        sql = u"insert into temp_values values(1, 5)"
+        cursor.execute(sql)
+
+        connector.commit()
+
         while (1):
             conn, addr = s_socket.accept()
             print("Conneted by"+str(addr))
@@ -50,6 +60,4 @@ def main():
             connClientThread.start()
 
 if __name__ == '__main__':
-    #connector = MySQLab.connect(host="localhost", db="s_test", user="root", passwd="", charset="utf8")
-    #cursor = connector.cursor()
     main()

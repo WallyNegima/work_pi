@@ -32,13 +32,17 @@ def main():
         print "system exit:connection error"
         sys.exit(0)
 
+    counter = 0
     while(1):
         #recvdata = c_socket.recv(1024)
         #print "ReciveData:"+recvdata
         senddata = raw_input("SendData:")
         c_socket.send(senddata)
+        counter = counter + 1
         if (senddata == "quit"):
             c_socket.close()
+            break
+        if(counter > 10):
             break
 
 if __name__ == '__main__':
