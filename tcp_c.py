@@ -42,7 +42,8 @@ def main():
         if (senddata == "quit"):
             c_socket.close()
             break
-        if(counter > 10):
+        elif(counter > 10):
+            c_socket.close()
             break
 
 if __name__ == '__main__':

@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
 import socket
 import threading
 import time
+import MySQLdb
+import sys
 
 HOSTNAME = "192.168.11.254"
 PORT = 12345
@@ -33,6 +36,7 @@ class ConnClient(threading.Thread):
         finally:
             self.conn_socket.close()
             print "connect close"
+            sys.exit(0)
 
     def stop(self):
         self.conn_socket.close()
@@ -43,7 +47,7 @@ def main():
         s_socket.listen(CLIENTNUM)
 
         # データベースへの接続
-        connector = MySQLdb.connect(host="localhost", db="pi_sensor", user="root", passwd="", charset="utf-8")
+        connector = MySQLdb.connect(host="localhost", db="pi_sensor", user="root", passwd="", charset="utf8")
         # カーソルを取得
         cursor = connector.cursor()
 
@@ -51,6 +55,8 @@ def main():
         cursor.execute(sql)
 
         connector.commit()
+        cursor.close()
+        connector.close()
 
         while (1):
             conn, addr = s_socket.accept()
