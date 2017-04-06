@@ -2,6 +2,7 @@
 import socket
 import MySQLdb
 import sys
+import datetime
 
 HOSTNAME = "192.168.11.254"
 PORT = 12345
@@ -24,10 +25,39 @@ cursor = connector.cursor()
 
 
 while True:
+    # reseive sensor data
     recvdata = conn.recv(1024)
     print "ReciveData:"+recvdata
-    if (recvdata == "quit" or recvdata == "¥n"):
+
+    # データベースの日付一覧を取得
+    cursor.execute('select * from temp_values')
+    records = cursor.fetchall()
+    #print records[0][0]
+    #print records[0][1]
+    #print records[0][2]
+
+
+    # get time
+    d = datetime.datetime.today()
+    print type(d.year)
+    #print 'select * from temp_values where year = %d AND month = %d AND day = %d' %(d.year, d.month, d.day)
+    cursor.execute('select * from temp_values where year = %d AND month = %d AND day = %d' %(d.year, d.month, d.day))
+    today = cursor.fetchall()
+
+    if today == 0:
+        # 初めての日付なら…
+        # 今日の日付分を格納してhourに1を格納
+        cursor.execute('insert into temp_values (year, month, day, hour) values (%d, %d, %d, %d)' %(d.year, d.month, d.day, 1))
+    else:
+        # すでに存在する日付なら…
+        # hourだけアップデートして1追加する
+        # cursor.execute('insert into temp_values (year, month, day, hour) values (%d, %d, %d, %d)' %(d.year, d.month, d.day, 1))
+        print "non null"
+
+    if recvdata == "quit" or recvdata == "¥n" :
         break
+
+
 # database commit & close
 connector.commit()
 cursor.close()
