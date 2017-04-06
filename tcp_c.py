@@ -11,7 +11,7 @@ a_pin = 18
 b_pin = 23
 # TRIG = for distance sensor
 TRIG = 27
-ECHO = 13
+ECHO = 22
 
 
 HOSTNAME = "192.168.11.254"
