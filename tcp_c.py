@@ -3,10 +3,16 @@ import socket
 import time
 import RPi.GPIO as GPIO
 
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
+# a & b pin = for photo sensor
 a_pin = 18
 b_pin = 23
+# TRIG = for distance sensor
+TRIG = 27
+ECHO = 13
+
 
 HOSTNAME = "192.168.11.254"
 PORT = 12345
@@ -33,6 +39,30 @@ def charge_time():
         count = count + 1
     return count
 
+def reading(sensor):
+    if sensor == 0:
+        GPIO.setup(TRIG, GPIO.OUT)
+        GPIO.setup(ECHO, GPIO.IN)
+        GPIO.output(TRIG, GPIO.LOW)
+        time.sleep(3)
+
+        GPIO.output(TRIG, True)
+        time.sleep(0.0001)
+        GPIO.output(TRIG, False)
+
+        while GPIO.input(ECHO) == 0:
+            signaloff = time.time()
+
+        while GPIO.input(ECHO) == 1:
+            signalon = time.time()
+
+        timepassed = signalon - signaloff
+        distance = timepassed * 17000
+        return distance
+        GPIO.cleanup()
+    else:
+        print "Incorrect usonic() function variable"
+
 c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 c_socket.connect((HOSTNAME, PORT))
 
@@ -40,21 +70,36 @@ if c_socket is None:
     print "system exit:connection error"
     sys.exit(0)
 
+print reading(0)
+
 counter = 0
 while(1):
     senddata = analog_read()
     print senddata
     #senddata = raw_input("SendData:")
     c_socket.send(str(senddata))
-    time.sleep(1)
-    counter = counter + 1
-    if (senddata == "quit"):
-        c_socket.close()
-        break
-    elif counter > 10:
-        c_socket.send("quit")
-        c_socket.close()
-        break
+
+    if senddata > 85:
+        # 指で抑えると暗くなって数値があがる
+        # 要するに暗いとき
+        counter = counter + 1
+        time.sleep(1)
+        if counter > 5:
+            c_socket.send("quit")
+            c_socket.close()
+            break
+    else:
+        # 指で抑えていないときの数値
+        # ようするに明るいとき
+        # 部屋の普通の明るさ=25
+        counter = 0
+        if (senddata == "quit"):
+            c_socket.close()
+            break
+        time.sleep(60)
+
+
+
 
 
 

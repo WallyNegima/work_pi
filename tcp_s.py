@@ -43,18 +43,19 @@ while True:
     #print 'select * from temp_values where year = %d AND month = %d AND day = %d' %(d.year, d.month, d.day)
     cursor.execute('select * from temp_values where year = %d AND month = %d AND day = %d' %(d.year, d.month, d.day))
     today = cursor.fetchall()
+    print today
 
-    if today == 0:
+    if len(today) == 0:
         # 初めての日付なら…
         # 今日の日付分を格納してhourに1を格納
         cursor.execute('insert into temp_values (year, month, day, hour) values (%d, %d, %d, %d)' %(d.year, d.month, d.day, 1))
     else:
         # すでに存在する日付なら…
         # hourだけアップデートして1追加する
-        # cursor.execute('insert into temp_values (year, month, day, hour) values (%d, %d, %d, %d)' %(d.year, d.month, d.day, 1))
+        cursor.execute('update temp_values set hour = %d+1 where year = %d AND month = %d AND day = %d' %(today[0][3], d.year, d.month, d.day))
         print "non null"
 
-    if recvdata == "quit" or recvdata == "¥n" :
+    if recvdata == "quit" or recvdata == "" :
         break
 
 
