@@ -42,19 +42,20 @@ while True:
         recvdata = conn.recv(1024)
         print "ReciveData2:" + recvdata
         #get time
-        d = datetime.datetime.today()
-        cursor.execute('select * from temp_values where year = %d AND month = %d AND day = %d' %(d.year, d.month, d.day))
+        d = datetime.date.today()
+        # print d
+        cursor.execute('select * from temp_values where date = date(now())' )
         today = cursor.fetchall()
-        #print today
+        # print today
 
         if len(today) == 0:
             # 初めての日付なら…
             # 今日の日付分を格納してhourに1を格納
-            cursor.execute('insert into temp_values (year, month, day, hour) values (%d, %d, %d, %d)' %(d.year, d.month, d.day, 1))
+            cursor.execute('insert into temp_values (date, hour) values (date(now()), %d)' %(1))
         else:
             # すでに存在する日付なら…
             # hourだけアップデートして1追加する
-            cursor.execute('update temp_values set hour = %d+1 where year = %d AND month = %d AND day = %d' %(today[0][3], d.year, d.month, d.day))
+            cursor.execute('update temp_values set hour = %d+1 where date = date(now())' %(today[0][1]))
 
     if recvdata == "quit" or recvdata == "" :
         break
