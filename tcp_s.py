@@ -27,33 +27,34 @@ cursor = connector.cursor()
 while True:
     # reseive sensor data
     recvdata = conn.recv(1024)
-    print "ReciveData:"+recvdata
+    print "ReciveData1:"+recvdata
 
     # データベースの日付一覧を取得
     cursor.execute('select * from temp_values')
     records = cursor.fetchall()
-    #print records[0][0]
-    #print records[0][1]
-    #print records[0][2]
 
+    if( recvdata != "quit"):
+        temp = int(recvdata)
 
-    # get time
-    d = datetime.datetime.today()
-    print type(d.year)
-    #print 'select * from temp_values where year = %d AND month = %d AND day = %d' %(d.year, d.month, d.day)
-    cursor.execute('select * from temp_values where year = %d AND month = %d AND day = %d' %(d.year, d.month, d.day))
-    today = cursor.fetchall()
-    print today
+    if( temp <= 85):
+        # 部屋が明るければ…
+        # get distance
+        recvdata = conn.recv(1024)
+        print "ReciveData2:" + recvdata
+        #get time
+        d = datetime.datetime.today()
+        cursor.execute('select * from temp_values where year = %d AND month = %d AND day = %d' %(d.year, d.month, d.day))
+        today = cursor.fetchall()
+        #print today
 
-    if len(today) == 0:
-        # 初めての日付なら…
-        # 今日の日付分を格納してhourに1を格納
-        cursor.execute('insert into temp_values (year, month, day, hour) values (%d, %d, %d, %d)' %(d.year, d.month, d.day, 1))
-    else:
-        # すでに存在する日付なら…
-        # hourだけアップデートして1追加する
-        cursor.execute('update temp_values set hour = %d+1 where year = %d AND month = %d AND day = %d' %(today[0][3], d.year, d.month, d.day))
-        print "non null"
+        if len(today) == 0:
+            # 初めての日付なら…
+            # 今日の日付分を格納してhourに1を格納
+            cursor.execute('insert into temp_values (year, month, day, hour) values (%d, %d, %d, %d)' %(d.year, d.month, d.day, 1))
+        else:
+            # すでに存在する日付なら…
+            # hourだけアップデートして1追加する
+            cursor.execute('update temp_values set hour = %d+1 where year = %d AND month = %d AND day = %d' %(today[0][3], d.year, d.month, d.day))
 
     if recvdata == "quit" or recvdata == "" :
         break

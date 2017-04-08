@@ -19,11 +19,11 @@ PORT = 12345
 INTERVAL = 3
 RETRYTIMES = 10
 
+##   光sensor の値取得
 def analog_read():
     discharge()
     return charge_time()
 
-## sensor の値取得
 def discharge():
     GPIO.setup(a_pin, GPIO.IN)
     GPIO.setup(b_pin, GPIO.OUT)
@@ -39,15 +39,16 @@ def charge_time():
         count = count + 1
     return count
 
+# 測距センサーで距離測定
 def reading(sensor):
     if sensor == 0:
         GPIO.setup(TRIG, GPIO.OUT)
         GPIO.setup(ECHO, GPIO.IN)
         GPIO.output(TRIG, GPIO.LOW)
-        time.sleep(3)
+        time.sleep(0.3)
 
         GPIO.output(TRIG, True)
-        time.sleep(0.0001)
+        time.sleep(0.00001)
         GPIO.output(TRIG, False)
 
         while GPIO.input(ECHO) == 0:
@@ -70,7 +71,6 @@ if c_socket is None:
     print "system exit:connection error"
     sys.exit(0)
 
-print reading(0)
 
 counter = 0
 while(1):
@@ -93,10 +93,13 @@ while(1):
         # ようするに明るいとき
         # 部屋の普通の明るさ=25
         counter = 0
+        senddata = reading(0)
+        print senddata
+        c_socket.send(str(senddata))
         if (senddata == "quit"):
             c_socket.close()
             break
-        time.sleep(60)
+        time.sleep(10)
 
 
 
