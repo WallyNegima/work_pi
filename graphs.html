@@ -1,32 +1,72 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Temperature Chart</title>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-      google.load("visualization", "1", {packages:["corechart"]});
-      google.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Temp'],
-        {% for record in temp_list %}
-          ['{{record.date}}',  {{record.temp}}],
-        {% endfor %}
-        ]);
-        // グラフのオプションを設定
-        var options = {
-          title: '{{title}}'
-        };
-        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-      }
-    </script>
-  </head>
-  <body>
+<head>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+  <script src="http://cdn.oesmith.co.uk/morris-0.4.1.min.js"></script>
+<meta charset=utf-8 />
+<title>Morris.js Bar Chart Example</title>
+</head>
+<body>
+  <?php
 
+  $link = mysql_connect('localhost', 'root', '');
+  if (!$link) {
+      die('接続失敗です。'.mysql_error());
+  }
 
-<div id="chart_div" style="width: 80%; height: 400px;"></div>
+  print '<p>接続に成功しました。</p>';
 
+  $db_selected = mysql_select_db('uriage', $link);
+  if (!$db_selected){
+      die('データベース選択失敗です。'.mysql_error());
+  }
 
-  </body>
+  print('<p>uriageデータベースを選択しました。</p>');
+
+  mysql_set_charset('utf8');
+
+  $result = mysql_query('SELECT date,hour FROM temp_values');
+  if (!$result) {
+      die('クエリーが失敗しました。'.mysql_error());
+  }
+
+  while ($row = mysql_fetch_assoc($result)) {
+      print('<p>');
+      print('id='.$row['date']);
+      print(',name='.$row['hour']);
+      print('</p>');
+  }
+
+  $close_flag = mysql_close($link);
+
+  if ($close_flag){
+      print('<p>切断に成功しました。</p>');
+  }
+
+  ?>
+  <div id="bar-example"></div>
+  <script>
+  /*
+ * Play with this code and it'll update in the panel opposite.
+ *
+ * Why not try some of the options above?
+ */
+Morris.Bar({
+  element: 'bar-example',
+  data: [
+    { y: '2006', a: 100, b: 90 },
+    { y: '2007', a: 75,  b: 65 },
+    { y: '2008', a: 50,  b: 40 },
+    { y: '2009', a: 75,  b: 65 },
+    { y: '2010', a: 50,  b: 40 },
+    { y: '2011', a: 75,  b: 65 },
+    { y: '2012', a: 100, b: 90 }
+  ],
+  xkey: 'y',
+  ykeys: ['a', 'b'],
+  labels: ['Series A', 'Series B']
+});
+  </script>
+</body>
 </html>
