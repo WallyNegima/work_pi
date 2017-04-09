@@ -65,18 +65,37 @@ def reading(sensor):
         print "Incorrect usonic() function variable"
 
 c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-c_socket.connect((HOSTNAME, PORT))
+while True:
+    try:
+        c_socket.connect((HOSTNAME, PORT))
+        break;
+    except socket.error:
+        print "waiting..."
 
 if c_socket is None:
     print "system exit:connection error"
     sys.exit(0)
 
-
 counter = 0
 while(1):
+    if counter > 5:
+        # 接続が切れている
+        #　再接続を行う
+        c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while True:
+            try:
+                c_socket.connect((HOSTNAME, PORT))
+                break;
+            except socket.error:
+                print "waiting...!"
+                time.sleep(5)
+
+
     senddata = analog_read()
     print senddata
     #senddata = raw_input("SendData:")
+
+
     c_socket.send(str(senddata))
 
     if senddata > 85:
@@ -86,8 +105,9 @@ while(1):
         time.sleep(1)
         if counter > 5:
             c_socket.send("quit")
+            c_socket.shutdown(1)
             c_socket.close()
-            break
+            time.sleep(3)
     else:
         # 指で抑えていないときの数値
         # ようするに明るいとき

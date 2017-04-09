@@ -48,11 +48,11 @@ while True:
         today = cursor.fetchall()
         # print today
 
-        if len(today) == 0:
+        if len(today) == 0 and recvdata > 9 and recvdata < 30:
             # 初めての日付なら…
             # 今日の日付分を格納してhourに1を格納
             cursor.execute('insert into temp_values (date, hour) values (date(now()), %d)' %(1))
-        else:
+        elif recvdata > 9 and recvdata < 30:
             # すでに存在する日付なら…
             # hourだけアップデートして1追加する
             cursor.execute('update temp_values set hour = %d+1 where date = date(now())' %(today[0][1]))
