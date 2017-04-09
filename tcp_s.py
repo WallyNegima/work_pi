@@ -8,6 +8,9 @@ HOSTNAME = "192.168.11.254"
 PORT = 12345
 CLIENTNUM = 3
 
+MIN_RANGE = 8
+MAX_RANGE = 50
+
 s_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s_socket.bind((HOSTNAME, PORT))
 s_socket.listen(CLIENTNUM)
@@ -48,11 +51,11 @@ while True:
         today = cursor.fetchall()
         # print today
 
-        if len(today) == 0 and recvdata > 9 and recvdata < 30:
+        if len(today) == 0 and recvdata > MIN_RANGE and recvdata < MAX_RANGE:
             # 初めての日付なら…
             # 今日の日付分を格納してhourに1を格納
             cursor.execute('insert into temp_values (date, hour) values (date(now()), %d)' %(1))
-        elif recvdata > 9 and recvdata < 30:
+        elif recvdata > MIN_RANGE and recvdata < MAX_RANGE:
             # すでに存在する日付なら…
             # hourだけアップデートして1追加する
             cursor.execute('update temp_values set hour = %d+1 where date = date(now())' %(today[0][1]))
