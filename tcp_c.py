@@ -13,6 +13,9 @@ b_pin = 23
 TRIG = 27
 ECHO = 22
 
+# 測距センサーのしきい値
+MIN_RANGE = 9
+MAX_RANGE = 50
 
 HOSTNAME = "192.168.11.254"
 PORT = 12345
@@ -64,110 +67,39 @@ def reading(sensor):
     else:
         print "Incorrect usonic() function variable"
 
-c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-while True:
-    try:
-        c_socket.connect((HOSTNAME, PORT))
-        break;
-    except socket.error:
-        print "waiting..."
-
-if c_socket is None:
-    print "system exit:connection error"
-    sys.exit(0)
-
 counter = 0
 while(1):
-    if counter > 5:
-        # 接続が切れている
-        #　再接続を行う
-        c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        while True:
-            try:
-                c_socket.connect((HOSTNAME, PORT))
-                break;
-            except socket.error:
-                print "waiting...!"
-                time.sleep(5)
-
-
-    senddata = analog_read()
-    print senddata
-    #senddata = raw_input("SendData:")
-
-
-    c_socket.send(str(senddata))
-
-    if senddata > 85:
-        # 指で抑えると暗くなって数値があがる
-        # 要するに暗いとき
-        counter = counter + 1
+    # 接続を試みる
+    c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        # 接続できたら送信
+        c_socket.connect((HOSTNAME, PORT))
+        c_socket.send(str(counter))
+        counter = 0
+        c_socket.shutdown(1)
+        c_socket.close()
+    except socket.error:
+        # 接続できなければ1秒まってセンシング再開
         time.sleep(1)
-        if counter > 5:
-            c_socket.send("quit")
-            c_socket.shutdown(1)
-            c_socket.close()
-            time.sleep(3)
-    else:
+
+    # 光度取得
+    temp = analog_read()
+    print temp
+
+    if int(temp) < 40:
         # 指で抑えていないときの数値
         # ようするに明るいとき
         # 部屋の普通の明るさ=25
-        counter = 0
-        senddata = reading(0)
-        print senddata
-        c_socket.send(str(senddata))
-        if (senddata == "quit"):
-            c_socket.close()
-            break
-        time.sleep(10)
 
+        # 距離取得
+        distance = reading(0)
+        print distance
 
-
-
-
-
-"""
-while True:
-    print analog_read()
-    time.sleep(1)
-
-def socket_connect(host, port, interval, retries):
-
-    c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    for x in range(retries):
-        try:
-            c_socket.connect((host, port))
-            return c_socket
-        except socket.error:
-            print "wait"+str(interval)+"s"
-            time.sleep(interval)
-
-    c_socket.close()
-    return None
-
-def main():
-
-    c_socket = socket_connect(HOSTNAME,PORT,INTERVAL,RETRYTIMES)
-
-    if c_socket is None:
-        print "system exit:connection error"
-        sys.exit(0)
-
-    counter = 0
-    while(1):
-        #recvdata = c_socket.recv(1024)
-        #print "ReciveData:"+recvdata
-        senddata = raw_input("SendData:")
-        c_socket.send(senddata)
-        counter = counter + 1
-        if (senddata == "quit"):
-            c_socket.close()
-            break
-        elif(counter > 10):
-            c_socket.close()
-            break
-
-if __name__ == '__main__':
-    main()
-"""
+        time.sleep(1)
+        if float(distance) > MIN_RANGE and float(distance) < MAX_RANGE:
+            counter = counter + 1
+    else:
+        # 指で抑えると暗くなって数値があがる
+        # 要するに暗いとき
+        pass
+    time.sleep(10)
