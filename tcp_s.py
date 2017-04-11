@@ -32,6 +32,7 @@ records = cursor.fetchall()
 d = datetime.date.today()
 cursor.execute('select * from temp_values where date = date(now())' )
 today = cursor.fetchall()
+print today
 
 if len(today) == 0:
     # 初めての日付なら…
@@ -40,7 +41,7 @@ if len(today) == 0:
 else :
     # すでに存在する日付なら…
     # hourだけアップデートして1追加する
-    cursor.execute('update temp_values set hour = hour + %d where date = date(now())' %(today[0][1]))
+    cursor.execute('update temp_values set hour = hour + %d where date = date(now())' %(int(recvdata)))
 
 
 # database commit & close
