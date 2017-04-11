@@ -32,7 +32,6 @@ records = cursor.fetchall()
 d = datetime.date.today()
 cursor.execute('select * from temp_values where date = date(now())' )
 today = cursor.fetchall()
-print today
 
 if len(today) == 0:
     # 初めての日付なら…
