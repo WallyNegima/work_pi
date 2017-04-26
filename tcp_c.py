@@ -151,6 +151,12 @@ while(1):
             data = cursor.fetchall()
             print data
 
+            hours = np.array(data) # arrayに変形
+            hours = hours[:,0] # タプルが入っているので数値だけの１次元arrayに整形
+            hours = hours.astype(np.int64) # 中身をすべて整数型にキャスト
+            total = hours.sum()
+            print total
+
             lab_minutes = (total*10)/60
             lab_hours = lab_minutes/60
             lab_minutes = lab_minutes - lab_hours*60
