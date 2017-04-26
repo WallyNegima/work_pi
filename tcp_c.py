@@ -2,6 +2,12 @@
 import socket
 import time
 import RPi.GPIO as GPIO
+import MySQLdb
+import sys
+import datetime
+import numpy as np
+from requests_oauthlib import OAuth1Session
+
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -17,10 +23,23 @@ ECHO = 22
 MIN_RANGE = 9
 MAX_RANGE = 50
 
+
+# twitter用
+CK = 'kGFWP2Fm8GF4Uc2vHegxC8bEX' #consumer key
+CS = 'IzV1TXgjB5rrOlV3M0Sf3Vcr91MFWo63TP7qWZPeGtH3NBC4cv' # consumer secert
+AT = '479461745-xdmEVNEYpgCBtGAX1Rss7TUqYhbuqrRhzT5cWXIm' # access token
+AS = 'BP8oTJf29ppq4QTNLjmSYv6kyyiNM30sWPkJHf5unKVH7' # access secret
+# ツイート投稿用のURL
+URL = "https://api.twitter.com/1.1/statuses/update.json"
+
+
+'''
+通信用だが、もう必要ないだろう
 HOSTNAME = "192.168.11.254"
 PORT = 12345
 INTERVAL = 3
 RETRYTIMES = 10
+'''
 
 ##   光sensor の値取得
 def analog_read():
@@ -67,20 +86,31 @@ def reading(sensor):
     else:
         print "Incorrect usonic() function variable"
 
+# tweet
+def tweet(text):
+    #Tweetを作成
+    params = {"status": text}
+
+    # OAuth認証して、POSTで投稿
+    twitter = OAuth1Session(CK, CS, AT, AS)
+    req = twitter.post(URL, params = params)
+
+    #レスポンスコードを返す
+    return req.status_code
+
 counter = 0
+
+# データベースへの接続
+connector = MySQLdb.connect(host="localhost", db="pi_sensor", user="root", passwd="kiyomizu", charset="utf8")
+# カーソルを取得
+cursor = connector.cursor()
+
 while(1):
-    # 接続を試みる
-    c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        # 接続できたら送信
-        c_socket.connect((HOSTNAME, PORT))
-        c_socket.send(str(counter))
-        counter = 0
-        c_socket.shutdown(1)
-        c_socket.close()
-    except socket.error:
-        # 接続できなければ1秒まってセンシング再開
-        time.sleep(1)
+
+
+
+    # database commit
+    connector.commit()
 
     # 光度取得
     temp = analog_read()
@@ -97,9 +127,57 @@ while(1):
 
         time.sleep(1)
         if float(distance) > MIN_RANGE and float(distance) < MAX_RANGE:
-            counter = counter + 1
+            # データベースの日付一覧を取得
+            cursor.execute('select * from temp_values')
+            records = cursor.fetchall()
+
+            d = datetime.date.today()
+            cursor.execute('select * from temp_values where date = date(now())' )
+            today = cursor.fetchall()
+            print(today)
+
+            if len(today) == 0:
+                # 初めての日付なら…
+                # 今日の日付分を格納してhourに1を格納
+                cursor.execute('insert into temp_values (date, hour) values (date(now()), 1)')
+            else :
+                # すでに存在する日付なら…
+                # hourだけアップデートして1追加する
+                test = 2
+                cursor.execute('update temp_values set hour = hour + %d where date = date(now())' %(test))
+
+            # データベースを明後日、総プレイ時間を計算
+            cursor.execute('select hour from temp_values')
+            data = cursor.fetchall()
+            print data
+
+            lab_minutes = (total*10)/60
+            lab_hours = lab_minutes/60
+            lab_minutes = lab_minutes - lab_hours*60
+
+            print('本日までのウォーリーの研究活動時間は約 %d 時間 %d 分 です。' %(lab_hours, lab_minutes))
     else:
         # 指で抑えると暗くなって数値があがる
         # 要するに暗いとき
         pass
     time.sleep(10)
+
+# database close
+cursor.close()
+connector.close()
+
+'''
+ラズパイですべてやっちゃうので通信必要ない
+# 接続を試みる
+c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    # 接続できたら送信
+    c_socket.connect((HOSTNAME, PORT))
+    c_socket.send(str(counter))
+    counter = 0
+    c_socket.shutdown(1)
+    c_socket.close()
+except socket.error:
+    # 接続できなければ1秒まってセンシング再開
+    time.sleep(1)
+'''
