@@ -135,6 +135,7 @@ while(1):
             cursor.execute('select * from temp_values where date = date(now())' )
             today = cursor.fetchall()
             print(today)
+            print(today[1])
 
             if len(today) == 0:
                 # 初めての日付なら…
@@ -144,7 +145,7 @@ while(1):
                 # すでに存在する日付なら…
                 # hourだけアップデートして1追加する
                 test = 2
-                cursor.execute('update temp_values set hour = hour + %d where date = date(now())' %(test))
+                cursor.execute('update temp_values set hour = hour + %d where date = date(now())' %(today[1]))
 
             # データベースを明後日、総プレイ時間を計算
             cursor.execute('select hour from temp_values')
