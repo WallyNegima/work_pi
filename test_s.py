@@ -78,7 +78,7 @@ print total
 lab_minutes = (total*10)/60
 lab_hours = lab_minutes/60
 lab_minutes = lab_minutes - lab_hours*60
-print tweet('本日までのウォーリーの研究活動時間は約 %d 時間 %d 分 です。' %(lab_hours, lab_minutes))
+print '本日までのウォーリーの研究活動時間は約 %d 時間 %d 分 です。' %(lab_hours, lab_minutes)
 
 # database commit & close
 connector.commit()
