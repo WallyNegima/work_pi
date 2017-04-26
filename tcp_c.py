@@ -106,9 +106,6 @@ connector = MySQLdb.connect(host="localhost", db="pi_sensor", user="root", passw
 cursor = connector.cursor()
 
 while(1):
-
-
-
     # database commit
     connector.commit()
 
@@ -172,19 +169,3 @@ while(1):
 # database close
 cursor.close()
 connector.close()
-
-'''
-ラズパイですべてやっちゃうので通信必要ない
-# 接続を試みる
-c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-try:
-    # 接続できたら送信
-    c_socket.connect((HOSTNAME, PORT))
-    c_socket.send(str(counter))
-    counter = 0
-    c_socket.shutdown(1)
-    c_socket.close()
-except socket.error:
-    # 接続できなければ1秒まってセンシング再開
-    time.sleep(1)
-'''
