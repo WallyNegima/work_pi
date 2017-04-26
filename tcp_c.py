@@ -135,7 +135,7 @@ while(1):
             cursor.execute('select * from temp_values where date = date(now())' )
             today = cursor.fetchall()
             print(today)
-            print(today[1])
+            print(today[0][1])
 
             if len(today) == 0:
                 # 初めての日付なら…
