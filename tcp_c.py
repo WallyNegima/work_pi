@@ -106,9 +106,6 @@ connector = MySQLdb.connect(host="localhost", db="pi_sensor", user="root", passw
 cursor = connector.cursor()
 
 while(1):
-    # database commit
-    connector.commit()
-
     # 光度取得
     temp = analog_read()
     print temp
@@ -131,34 +128,32 @@ while(1):
             d = datetime.date.today()
             cursor.execute('select * from temp_values where date = date(now())' )
             today = cursor.fetchall()
-            print(today)
-            print(today[0][1])
+            # print(today)
 
             if len(today) == 0:
                 # 初めての日付なら…
                 # 今日の日付分を格納してhourに1を格納
                 cursor.execute('insert into temp_values (date, hour) values (date(now()), 1)')
+		
+		# データベースを明後日、総プレイ時間を計算
+		cursor.execute('select hour from temp_values')
+		data = cursor.fetchall()
+		# print data
+
+		hours = np.array(data) # arrayに変形
+		hours = hours[:,0] # タプルが入っているので数値だけの１次元arrayに整形
+		hours = hours.astype(np.int64) # 中身をすべて整数型にキャスト
+		total = hours.sum()
+		# print total
+
+		lab_minutes = (total*10)/60
+		lab_hours = lab_minutes/60
+		lab_minutes = lab_minutes - lab_hours*60
                 print tweet('本日までのウォーリーの研究活動時間は約 %d 時間 %d 分 です。' %(lab_hours, lab_minutes))
             else :
                 # すでに存在する日付なら…
                 # hourだけアップデートして1追加する
-                test = 2
                 cursor.execute('update temp_values set hour = 1 + %d where date = date(now())' %(today[0][1]))
-
-            # データベースを明後日、総プレイ時間を計算
-            cursor.execute('select hour from temp_values')
-            data = cursor.fetchall()
-            # print data
-
-            hours = np.array(data) # arrayに変形
-            hours = hours[:,0] # タプルが入っているので数値だけの１次元arrayに整形
-            hours = hours.astype(np.int64) # 中身をすべて整数型にキャスト
-            total = hours.sum()
-            # print total
-
-            lab_minutes = (total*10)/60
-            lab_hours = lab_minutes/60
-            lab_minutes = lab_minutes - lab_hours*60
 
 
     else:
