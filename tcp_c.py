@@ -134,7 +134,7 @@ while(1):
                 # 初めての日付なら…
                 # 今日の日付分を格納してhourに1を格納
                 cursor.execute('insert into temp_values (date, hour) values (date(now()), 1)')
-		cursor.commit()	
+		connector.commit()
 		# データベースを明後日、総プレイ時間を計算
 		cursor.execute('select hour from temp_values')
 		data = cursor.fetchall()
@@ -154,7 +154,8 @@ while(1):
                 # すでに存在する日付なら…
                 # hourだけアップデートして1追加する
                 cursor.execute('update temp_values set hour = 1 + %d where date = date(now())' %(today[0][1]))
-		cursor.commit()
+		connector.commit()
+
 
     else:
         # 指で抑えると暗くなって数値があがる
