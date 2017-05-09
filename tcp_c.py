@@ -136,7 +136,6 @@ while(1):
         print tweet('本日までのウォーリーの研究活動時間は約 %d 時間 %d 分 です。' %(lab_hours, lab_minutes))
         # database commit
         connector.commit()
-
     # 光度取得
     temp = analog_read()
     print temp
@@ -157,7 +156,6 @@ while(1):
             cursor.execute('update temp_values set hour = 1 + %d where date = date(now())' %(today[0][1]))
             # database commit
             connector.commit()
-
     else:
         # 指で抑えると暗くなって数値があがる
         # 要するに暗いとき
