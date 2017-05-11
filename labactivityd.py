@@ -134,7 +134,7 @@ def labactivity():
             lab_hours = lab_minutes/60
             lab_minutes = lab_minutes - lab_hours*60
             cursor.execute('insert into temp_values (date, hour) values (date(now()), 0)')
-            print tweet('本日までのウォーリーの研究活動時間は約 %d 時間 %d 分 です。' %(lab_hours, lab_minutes))
+            tweet('本日までのウォーリーの研究活動時間は約 %d 時間 %d 分 です。' %(lab_hours, lab_minutes))
             # database commit
             connector.commit()
         # 光度取得
@@ -153,7 +153,6 @@ def labactivity():
             time.sleep(1)
             if float(distance) > MIN_RANGE and float(distance) < MAX_RANGE:
                 # hourだけアップデートして1追加する
-                test = 2
                 cursor.execute('update temp_values set hour = 1 + %d where date = date(now())' %(today[0][1]))
                 # database commit
                 connector.commit()
