@@ -99,7 +99,6 @@ def tweet(text):
     #レスポンスコードを返す
     return req.status_code
 
-counter = 0
 def labactivity():
 	# データベースへの接続
 	connector = MySQLdb.connect(host="localhost", db="pi_sensor", user="root", passwd="kiyomizu", charset="utf8")
