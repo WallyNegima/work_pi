@@ -3,7 +3,6 @@
 import os
 import time
 import RPi.GPIO as GPIO
-import MySQLdb
 import sys
 import datetime
 import numpy as np
