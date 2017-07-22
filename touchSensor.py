@@ -5,7 +5,6 @@ import time
 import RPi.GPIO as GPIO
 import sys
 import datetime
-import numpy as np
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
