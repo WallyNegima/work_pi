@@ -13,10 +13,12 @@ GPIO.setmode(GPIO.BCM)
 TRIG = [19,13,6,5,11,22,27,17]
 ECHO = [21,20,16,12,25,24,23,18]
 
+counter =  [[0 for i in range(15)] for j in range(8)]
+timer = [[0 for i in range(15)] for j in range(8)]
+
 # 測距センサーで距離測定
 def readDistance(sensor, trig, echo):
     if sensor >= 0:
-#        print('%d' %sensor)
         GPIO.output(trig, True)
         time.sleep(0.00001)
         GPIO.output(trig, False)
@@ -45,9 +47,21 @@ def main():
   while(1):
     for i in range(8):
       distance = readDistance(i, TRIG[i], ECHO[i])
-      print(distance)
-      time.sleep(0.01)
-    print "-----------"
+      if distance < 150:
+          distance = int(distance/10)
+          #print '%d %d' %(i, distance)
+          if timer[i][distance] == 0:
+              timer[i][distance] = time.time()
+              counter[i][distance] = counter[i][distance]+1
+          elif (time.time()-timer[i][distance]) < 5:
+              #print '%f' %(time.time()-timer[i][distance])
+              counter[i][distance] = counter[i][distance] + 1
+              if counter[i][distance] == 3:
+                  print 'fooooooooo%d %d' %(i, distance)
+          else:
+              timer[i][distance] = time.time()
+              counter[i][distance] = 1
+      time.sleep(0.005)
 
 if __name__ == "__main__":
   main()
