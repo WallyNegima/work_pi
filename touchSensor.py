@@ -5,6 +5,7 @@ import time
 import RPi.GPIO as GPIO
 import sys
 import datetime
+import subprocess
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -22,7 +23,6 @@ def readDistance(sensor, trig, echo):
         GPIO.output(trig, True)
         time.sleep(0.00001)
         GPIO.output(trig, False)
-
         while GPIO.input(echo) == 0:
             signaloff = time.time()
 
@@ -53,15 +53,19 @@ def main():
           if timer[i][distance] == 0:
               timer[i][distance] = time.time()
               counter[i][distance] = counter[i][distance]+1
-          elif (time.time()-timer[i][distance]) < 5:
+          elif (time.time()-timer[i][distance]) < 3:
               #print '%f' %(time.time()-timer[i][distance])
               counter[i][distance] = counter[i][distance] + 1
-              if counter[i][distance] == 3:
+              if counter[i][distance] == 2:
                   print 'fooooooooo%d %d' %(i, distance)
+                  x = i
+                  y = distance
+                  cmd = 'python sound.py %d %d' %(x,y)
+                  subprocess.call(cmd.strip().split(" "))
           else:
               timer[i][distance] = time.time()
               counter[i][distance] = 1
       time.sleep(0.005)
 
 if __name__ == "__main__":
-  main()
+    main()
